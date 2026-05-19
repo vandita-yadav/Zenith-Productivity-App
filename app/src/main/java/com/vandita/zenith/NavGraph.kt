@@ -52,10 +52,19 @@ fun ZenithNavigation()
                     navBackStackEntry?.destination?.route
 
                 items.forEach { item ->
-
                     NavigationBarItem(
 
                         selected = currentRoute == item.route,
+
+                        colors = NavigationBarItemDefaults.colors(
+
+                            selectedIconColor = DeepGreen,
+                            selectedTextColor = DeepGreen,
+                            indicatorColor = CreamBackground,
+
+                            unselectedIconColor = androidx.compose.ui.graphics.Color.Black,
+                            unselectedTextColor = androidx.compose.ui.graphics.Color.Black
+                        ),
 
                         onClick = {
 

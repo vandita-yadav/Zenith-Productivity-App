@@ -19,6 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 
 @Composable
 fun ZenModeScreen(completedSessions: List<FocusSession> = emptyList(),
@@ -33,156 +36,162 @@ fun ZenModeScreen(completedSessions: List<FocusSession> = emptyList(),
 
     // Calculate total seconds
     val totalSeconds = try {
-        (hours.toIntOrNull() ?: 0) * 3600 + (minutes.toIntOrNull() ?: 0) * 60 + (seconds.toIntOrNull() ?: 0)
+        (hours.toIntOrNull() ?: 0) * 3600 + (minutes.toIntOrNull()
+            ?: 0) * 60 + (seconds.toIntOrNull() ?: 0)
     } catch (e: Exception) {
         0
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(CreamBackground)
-            .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-
-        // Header
-        Text(
-            text = "Focus Mode 🎯",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = DeepGreen
+    Column(modifier = Modifier.fillMaxSize())
+    {
+        ZenithHeader(
+            title = "Focus Session",
+            iconRes = R.drawable.tree
         )
 
-        if (!sessionStarted) {
-            // Session Type Selection
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
 
-                Text(
-                    text = "Select Session Type",
-                    fontSize = 14.sp,
-                    color = MutedClay,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
+        Spacer(modifier = Modifier.height(5.dp))
 
-                Row(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(CreamBackground)
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            if (!sessionStarted) {
+                // Session Type Selection
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    SessionTypeButton(
-                        title = "Study",
-                        selected = selectedSession == "Study",
-                        onClick = { selectedSession = "Study" },
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    SessionTypeButton(
-                        title = "Work",
-                        selected = selectedSession == "Work",
-                        onClick = { selectedSession = "Work" },
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    SessionTypeButton(
-                        title = "Gym",
-                        selected = selectedSession == "Gym",
-                        onClick = { selectedSession = "Gym" },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-
-            // Time Input
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(CardBackground, RoundedCornerShape(16.dp))
-                    .padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                Text(
-                    text = "Set Duration (HH:MM:SS)",
-                    fontSize = 14.sp,
-                    color = MutedClay,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    // Hours
-                    TimeInputField(
-                        value = hours,
-                        onValueChange = { hours = it },
-                        label = "HH",
-                        modifier = Modifier.weight(1f)
+                    Text(
+                        text = "Select Session Type",
+                        fontSize = 14.sp,
+                        color = MutedClay,
+                        modifier = Modifier.padding(bottom = 12.dp)
                     )
 
-                    Text(":", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = DeepGreen)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        SessionTypeButton(
+                            title = "Study",
+                            selected = selectedSession == "Study",
+                            onClick = { selectedSession = "Study" },
+                            modifier = Modifier.weight(1f)
+                        )
 
-                    // Minutes
-                    TimeInputField(
-                        value = minutes,
-                        onValueChange = { minutes = it },
-                        label = "MM",
-                        modifier = Modifier.weight(1f)
-                    )
+                        SessionTypeButton(
+                            title = "Work",
+                            selected = selectedSession == "Work",
+                            onClick = { selectedSession = "Work" },
+                            modifier = Modifier.weight(1f)
+                        )
 
-                    Text(":", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = DeepGreen)
-
-                    // Seconds
-                    TimeInputField(
-                        value = seconds,
-                        onValueChange = { seconds = it },
-                        label = "SS",
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-
-            // Start Button
-            Button(
-                onClick = {
-                    if (totalSeconds > 0) {
-                        sessionStarted = true
+                        SessionTypeButton(
+                            title = "Gym",
+                            selected = selectedSession == "Gym",
+                            onClick = { selectedSession = "Gym" },
+                            modifier = Modifier.weight(1f)
+                        )
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = DeepGreen
-                ),
-                enabled = totalSeconds > 0
-            ) {
-                Text(
-                    text = "Start Focus Session",
-                    fontSize = 16.sp,
-                    color = CreamBackground,
-                    fontWeight = FontWeight.SemiBold
+                }
+
+                // Time Input
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(CardBackground, RoundedCornerShape(16.dp))
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Text(
+                        text = "Set Duration (HH:MM:SS)",
+                        fontSize = 14.sp,
+                        color = MutedClay,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        // Hours
+                        TimeInputField(
+                            value = hours,
+                            onValueChange = { hours = it },
+                            label = "HH",
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Text(":", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = DeepGreen)
+
+                        // Minutes
+                        TimeInputField(
+                            value = minutes,
+                            onValueChange = { minutes = it },
+                            label = "MM",
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Text(":", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = DeepGreen)
+
+                        // Seconds
+                        TimeInputField(
+                            value = seconds,
+                            onValueChange = { seconds = it },
+                            label = "SS",
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+
+                // Start Button
+                Button(
+                    onClick = {
+                        if (totalSeconds > 0) {
+                            sessionStarted = true
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = DeepGreen
+                    ),
+                    enabled = totalSeconds > 0
+                ) {
+                    Text(
+                        text = "Start Focus Session",
+                        fontSize = 16.sp,
+                        color = CreamBackground,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            // TIMER SCREEN
+            if (sessionStarted) {
+                TimerRunning(
+                    sessionType = selectedSession,
+                    totalSeconds = totalSeconds,
+                    onSessionEnd = { session ->
+                        onSessionAdded(session)
+                        sessionStarted = false
+                    }
                 )
             }
-        }
-
-        // TIMER SCREEN
-        if (sessionStarted) {
-            TimerRunning(
-                sessionType = selectedSession,
-                totalSeconds = totalSeconds,
-                onSessionEnd = { session ->
-                    onSessionAdded(session)
-                    sessionStarted = false
-                }
-            )
         }
     }
 }

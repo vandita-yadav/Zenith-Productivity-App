@@ -16,47 +16,49 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun HistoryScreen(completedSessions: List<FocusSession> = emptyList()) {
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(CreamBackground)
-            .padding(20.dp)
-    ) {
-
-        Text(
-            text = "Session History 📈",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = DeepGreen
+    Column(modifier = Modifier.fillMaxSize())
+    {
+        ZenithHeader(
+            title = "History",
+            iconRes = R.drawable.history
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
 
-        if (completedSessions.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "No sessions completed yet.\nStart a focus session to see history!",
-                    fontSize = 16.sp,
-                    color = MutedClay,
-                    modifier = Modifier.padding(20.dp)
-                )
-            }
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(completedSessions) { session ->
-                    SessionHistoryCard(session)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(CreamBackground)
+                .padding(20.dp)
+        ) {
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (completedSessions.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No sessions completed yet.\nStart a focus session to see history!",
+                        fontSize = 16.sp,
+                        color = MutedClay,
+                        modifier = Modifier.padding(20.dp)
+                    )
+                }
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(completedSessions) { session ->
+                        SessionHistoryCard(session)
+                    }
                 }
             }
         }
     }
 }
-
 @Composable
 fun SessionHistoryCard(session: FocusSession) {
     Column(
