@@ -12,12 +12,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun ZenithNavigation()
 {
+
+    var completedSessions by remember { mutableStateOf<List<FocusSession>>(emptyList()) }
 
     val navController = rememberNavController()
 
@@ -84,12 +89,17 @@ fun ZenithNavigation()
                 DashboardScreen()
             }
 
-            composable(`Screen`.ZenMode.route) {
-                ZenModeScreen()
+            composable(Screen.ZenMode.route) {
+                ZenModeScreen(
+                    completedSessions = completedSessions,
+                    onSessionAdded = { session ->
+                        completedSessions = completedSessions + session
+                    }
+                )
             }
 
-            composable(`Screen`.History.route) {
-                HistoryScreen()
+            composable(Screen.History.route) {
+                HistoryScreen(completedSessions = completedSessions)
             }
         }
     }

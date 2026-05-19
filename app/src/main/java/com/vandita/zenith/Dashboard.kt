@@ -38,13 +38,13 @@ fun DashboardScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(CreamBackground)
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
 
         // Header
         item {
-            Spacer(modifier = Modifier.height(52.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Good day 👋",
                 fontSize = 24.sp,
@@ -56,7 +56,6 @@ fun DashboardScreen() {
                 fontSize = 14.sp,
                 color = MutedClay
             )
-            Spacer(modifier = Modifier.height(8.dp))
         }
 
         // Health Score Card
@@ -95,49 +94,109 @@ fun DashboardScreen() {
             }
         }
 
-        // Top Apps Header
+        // STATISTICS SECTION
         item {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "📊 Statistics",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = DeepGreen
+            )
+        }
 
+        // KPI Cards Row 1
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                KPICard(
+                    title = "Total Time",
+                    value = "${totalMinutes / 60}h",
+                    subtitle = "${totalMinutes % 60}m today",
+                    backgroundColor = CardBackground,
+                    valueColor = DeepGreen,
+                    modifier = Modifier.weight(1f)
+                )
+
+                KPICard(
+                    title = "Apps Used",
+                    value = "${appList.size}",
+                    subtitle = "in Top 7",
+                    backgroundColor = Color(0xFFFFE5CC),
+                    valueColor = BurntVienna,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
+        // KPI Cards Row 2
+        item {
+            if (appList.isNotEmpty()) {
+                val mostUsedApp = appList.first()
+                val percentage = if (totalMinutes > 0) {
+                    ((mostUsedApp.totalMinutes * 100) / totalMinutes).toInt()
+                } else 0
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    KPICard(
+                        title = "Most Used",
+                        value = mostUsedApp.appName.take(12),
+                        subtitle = "$percentage% of time",
+                        backgroundColor = Color(0xFFE8F5E9),
+                        valueColor = Color(0xFF6A7E3F),
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    KPICard(
+                        title = "Avg Per App",
+                        value = "${if (appList.isNotEmpty()) totalMinutes / appList.size else 0}m",
+                        subtitle = "across apps",
+                        backgroundColor = Color(0xFFF3E5F5),
+                        valueColor = Color(0xFF7B3FF2),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+
+        // View Insights Button
+        item {
             Button(
                 onClick = {
-
-                    // Find first app above 2 hours
-                    val heavyUsageApp = appList.find {
-                        it.totalMinutes >= 1
-                    }
-
+                    val heavyUsageApp = appList.find { it.totalMinutes >= 120 }
                     if (heavyUsageApp != null) {
-
                         showFocusNotification(
                             context = context,
                             appName = heavyUsageApp.appName,
                             minutes = heavyUsageApp.totalMinutes
                         )
                     }
-
                 },
-
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
-
                 shape = RoundedCornerShape(14.dp),
-
                 colors = ButtonDefaults.buttonColors(
                     containerColor = DeepGreen
                 )
-
             ) {
-
                 Text(
                     text = "View Insights",
                     color = CreamBackground,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
+
+        // Top Apps Header
         item {
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "Your Top Apps Today",
                 fontSize = 18.sp,
@@ -149,7 +208,6 @@ fun DashboardScreen() {
                 fontSize = 13.sp,
                 color = MutedClay
             )
-            Spacer(modifier = Modifier.height(4.dp))
         }
 
         // App list — real data from your phone

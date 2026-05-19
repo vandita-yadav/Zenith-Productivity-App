@@ -21,13 +21,15 @@ import kotlinx.coroutines.delay
 import androidx.compose.foundation.text.KeyboardOptions
 
 @Composable
-fun ZenModeScreen() {
+fun ZenModeScreen(completedSessions: List<FocusSession> = emptyList(),
+                  onSessionAdded: (FocusSession) -> Unit = {}) {
 
     var selectedSession by remember { mutableStateOf("Study") }
     var hours by remember { mutableStateOf("0") }
     var minutes by remember { mutableStateOf("25") }
     var seconds by remember { mutableStateOf("0") }
     var sessionStarted by remember { mutableStateOf(false) }
+
 
     // Calculate total seconds
     val totalSeconds = try {
@@ -176,7 +178,10 @@ fun ZenModeScreen() {
             TimerRunning(
                 sessionType = selectedSession,
                 totalSeconds = totalSeconds,
-                onSessionEnd = { sessionStarted = false }
+                onSessionEnd = { session ->
+                    onSessionAdded(session)
+                    sessionStarted = false
+                }
             )
         }
     }
@@ -186,7 +191,7 @@ fun ZenModeScreen() {
 fun TimerRunning(
     sessionType: String,
     totalSeconds: Int,
-    onSessionEnd: () -> Unit
+    onSessionEnd: (FocusSession) -> Unit
 ) {
     var timeLeftSeconds by remember { mutableStateOf(totalSeconds) }
     var isRunning by remember { mutableStateOf(true) }
@@ -207,7 +212,8 @@ fun TimerRunning(
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-    ) {
+        ) {
+
 
         Text(
             text = "Session Running ⏳",
@@ -266,7 +272,17 @@ fun TimerRunning(
             }
 
             Button(
-                onClick = onSessionEnd,
+                onClick = {
+                    val timeSpent = totalSeconds - timeLeftSeconds
+                    val timeSpentMinutes = timeSpent / 60
+                    val session = FocusSession(
+                        sessionType = sessionType,
+                        durationMinutes = totalSeconds / 60,
+                        timeSpentMinutes = timeSpentMinutes,
+                        completedAt = getCurrentTime()
+                    )
+                    onSessionEnd(session)
+                },
                 modifier = Modifier
                     .weight(1f)
                     .height(52.dp),
