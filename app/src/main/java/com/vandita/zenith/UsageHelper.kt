@@ -12,7 +12,7 @@ data class AppUsageInfo(
     val totalMinutes: Long
 )
 
-// System apps to hide — they're not useful to the user
+
 private val hiddenPackages = setOf(
     "com.google.android.apps.nexuslauncher",
     "com.android.launcher",
@@ -47,36 +47,36 @@ fun getTopApps(context: Context): List<AppUsageInfo> {
 
     val pm = context.packageManager
 
-    return stats
-        .filter { stat ->
-            stat.totalTimeInForeground > 60000  // minimum 1 minute — removes 0m apps
-                    && stat.packageName !in hiddenPackages  // removes system/launcher apps
-                    && stat.packageName != context.packageName  // removes Zenith itself
-                    && !stat.packageName.startsWith("com.example")
-        }
-        .sortedByDescending { it.totalTimeInForeground }
-        .take(7)
-        .map { stat ->
-            val appName = try {
-                pm.getApplicationLabel(
-                    pm.getApplicationInfo(stat.packageName, 0)
-                ).toString()
-            } catch (e: PackageManager.NameNotFoundException) {
-                // If name not found, skip it by using package name
-                // We'll filter these out below
-                stat.packageName
+    val appInfoList = mutableListOf<AppUsageInfo>()
+
+    for (stat in stats) {
+        if (stat.totalTimeInForeground < 60000) continue  // Skip < 1 min
+        if (stat.packageName in hiddenPackages) continue  // Skip system apps
+        if (stat.packageName == context.packageName) continue  // Skip Zenith itself
+
+        try {
+            val appInfo = pm.getApplicationInfo(stat.packageName, 0)
+            val appName = pm.getApplicationLabel(appInfo).toString()
+
+            // Only add if we got a real app name (not package name)
+            if (!appName.contains(".") && appName.isNotEmpty() && appName.length < 50) {
+                appInfoList.add(
+                    AppUsageInfo(
+                        appName = appName,
+                        packageName = stat.packageName,
+                        totalMinutes = stat.totalTimeInForeground / 60000
+                    )
+                )
             }
-            AppUsageInfo(
-                appName = appName,
-                packageName = stat.packageName,
-                totalMinutes = stat.totalTimeInForeground / 60000
-            )
+        } catch (e: Exception) {
+            // Skip apps we can't get name for
+            continue
         }
-        .filter { app ->
-            // Remove anything that still shows raw package name format
-            !app.appName.contains(".")
-                    || app.appName.length < 30
-        }
+    }
+
+    return appInfoList
+        .sortedByDescending { it.totalMinutes }
+        .take(7)
 }
 
 fun getTotalScreenMinutes(apps: List<AppUsageInfo>): Long {
