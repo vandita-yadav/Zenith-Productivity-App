@@ -116,7 +116,7 @@ fun ZenModeScreen(completedSessions: List<FocusSession> = emptyList(),
                     Text(
                         text = "Set Duration (HH:MM:SS)",
                         fontSize = 14.sp,
-                        color = MutedClay,
+                        color = Color.Black,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
@@ -134,7 +134,7 @@ fun ZenModeScreen(completedSessions: List<FocusSession> = emptyList(),
                             modifier = Modifier.weight(1f)
                         )
 
-                        Text(":", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = DeepGreen)
+                        Text(":", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
 
                         // Minutes
                         TimeInputField(
@@ -144,7 +144,7 @@ fun ZenModeScreen(completedSessions: List<FocusSession> = emptyList(),
                             modifier = Modifier.weight(1f)
                         )
 
-                        Text(":", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = DeepGreen)
+                        Text(":", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
 
                         // Seconds
                         TimeInputField(
@@ -355,10 +355,10 @@ fun TimeInputField(
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = CreamBackground,
-            unfocusedContainerColor = Color.White,
-            focusedIndicatorColor = BurntVienna,
-            unfocusedIndicatorColor = MutedClay
+            focusedContainerColor = Color.Black,
+            unfocusedContainerColor = Color.Black,
+            focusedIndicatorColor = Color.White,
+            unfocusedIndicatorColor = Color.White
         ),
         textStyle = androidx.compose.material3.LocalTextStyle.current.copy(
             fontSize = 18.sp,
