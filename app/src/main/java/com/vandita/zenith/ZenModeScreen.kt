@@ -6,174 +6,280 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import androidx.compose.foundation.text.KeyboardOptions
 
 @Composable
 fun ZenModeScreen() {
 
     var selectedSession by remember { mutableStateOf("Study") }
-    var selectedDuration by remember { mutableStateOf(25) }
+    var hours by remember { mutableStateOf("0") }
+    var minutes by remember { mutableStateOf("25") }
+    var seconds by remember { mutableStateOf("0") }
     var sessionStarted by remember { mutableStateOf(false) }
+
+    // Calculate total seconds
+    val totalSeconds = try {
+        (hours.toIntOrNull() ?: 0) * 3600 + (minutes.toIntOrNull() ?: 0) * 60 + (seconds.toIntOrNull() ?: 0)
+    } catch (e: Exception) {
+        0
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(CreamBackground)
-            .padding(24.dp),
-
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
 
-        Spacer(modifier = Modifier.height(48.dp))
-
+        // Header
         Text(
             text = "Focus Mode 🎯",
-            fontSize = 30.sp,
+            fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = DeepGreen
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Choose your session type",
-            fontSize = 15.sp,
-            color = MutedClay
-        )
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        SessionButton(
-            title = "Study",
-            selected = selectedSession == "Study",
-            onClick = {
-                selectedSession = "Study"
-            }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        SessionButton(
-            title = "Work",
-            selected = selectedSession == "Work",
-            onClick = {
-                selectedSession = "Work"
-            }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        SessionButton(
-            title = "Gym",
-            selected = selectedSession == "Gym",
-            onClick = {
-                selectedSession = "Gym"
-            }
-        )
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Text(
-            text = "Choose duration",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = DeepGreen
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-
-            DurationButton(
-                minutes = 25,
-                selected = selectedDuration == 25,
-                onClick = {
-                    selectedDuration = 25
-                }
-            )
-
-            DurationButton(
-                minutes = 45,
-                selected = selectedDuration == 45,
-                onClick = {
-                    selectedDuration = 45
-                }
-            )
-
-            DurationButton(
-                minutes = 60,
-                selected = selectedDuration == 60,
-                onClick = {
-                    selectedDuration = 60
-                }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        if(!sessionStarted)
-        {
-            Text(
-                text = "Selected: $selectedSession • $selectedDuration min",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
-                color = BurntVienna
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            Button(
-                onClick = { sessionStarted = true },
-
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-
-                shape = RoundedCornerShape(16.dp),
-
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = DeepGreen
-                )
-
+        if (!sessionStarted) {
+            // Session Type Selection
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
                 Text(
+                    text = "Select Session Type",
+                    fontSize = 14.sp,
+                    color = MutedClay,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    SessionTypeButton(
+                        title = "Study",
+                        selected = selectedSession == "Study",
+                        onClick = { selectedSession = "Study" },
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    SessionTypeButton(
+                        title = "Work",
+                        selected = selectedSession == "Work",
+                        onClick = { selectedSession = "Work" },
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    SessionTypeButton(
+                        title = "Gym",
+                        selected = selectedSession == "Gym",
+                        onClick = { selectedSession = "Gym" },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            // Time Input
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(CardBackground, RoundedCornerShape(16.dp))
+                    .padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Text(
+                    text = "Set Duration (HH:MM:SS)",
+                    fontSize = 14.sp,
+                    color = MutedClay,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    // Hours
+                    TimeInputField(
+                        value = hours,
+                        onValueChange = { hours = it },
+                        label = "HH",
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Text(":", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = DeepGreen)
+
+                    // Minutes
+                    TimeInputField(
+                        value = minutes,
+                        onValueChange = { minutes = it },
+                        label = "MM",
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Text(":", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = DeepGreen)
+
+                    // Seconds
+                    TimeInputField(
+                        value = seconds,
+                        onValueChange = { seconds = it },
+                        label = "SS",
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            // Start Button
+            Button(
+                onClick = {
+                    if (totalSeconds > 0) {
+                        sessionStarted = true
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = DeepGreen
+                ),
+                enabled = totalSeconds > 0
+            ) {
+                Text(
                     text = "Start Focus Session",
-                    fontSize = 17.sp,
+                    fontSize = 16.sp,
                     color = CreamBackground,
                     fontWeight = FontWeight.SemiBold
                 )
             }
         }
 
+        // TIMER SCREEN
         if (sessionStarted) {
+            TimerRunning(
+                sessionType = selectedSession,
+                totalSeconds = totalSeconds,
+                onSessionEnd = { sessionStarted = false }
+            )
+        }
+    }
+}
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+@Composable
+fun TimerRunning(
+    sessionType: String,
+    totalSeconds: Int,
+    onSessionEnd: () -> Unit
+) {
+    var timeLeftSeconds by remember { mutableStateOf(totalSeconds) }
+    var isRunning by remember { mutableStateOf(true) }
 
-                Spacer(modifier = Modifier.height(32.dp))
+    LaunchedEffect(isRunning) {
+        while (isRunning && timeLeftSeconds > 0) {
+            delay(1000)
+            timeLeftSeconds--
+        }
+        if (timeLeftSeconds == 0) {
+            isRunning = false
+        }
+    }
 
-                Text(
-                    text = "Focus Session Running ⏳",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = DeepGreen
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        Text(
+            text = "Session Running ⏳",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = DeepGreen
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Big Timer Display
+        val h = timeLeftSeconds / 3600
+        val m = (timeLeftSeconds % 3600) / 60
+        val s = timeLeftSeconds % 60
+
+        Text(
+            text = String.format("%02d:%02d:%02d", h, m, s),
+            fontSize = 80.sp,
+            fontWeight = FontWeight.Bold,
+            color = DeepGreen,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = sessionType,
+            fontSize = 16.sp,
+            color = MutedClay,
+            fontWeight = FontWeight.Medium
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Pause/Resume and Stop Buttons
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Button(
+                onClick = { isRunning = !isRunning },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(52.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = BurntVienna
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
+            ) {
                 Text(
-                    text = "$selectedSession • $selectedDuration minutes",
-                    fontSize = 18.sp,
-                    color = BurntVienna
+                    text = if (isRunning) "Pause" else "Resume",
+                    fontSize = 14.sp,
+                    color = CreamBackground,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            Button(
+                onClick = onSessionEnd,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(52.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = BurntVienna
+                )
+            ) {
+                Text(
+                    text = "Stop",
+                    fontSize = 14.sp,
+                    color = CreamBackground,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
@@ -181,67 +287,58 @@ fun ZenModeScreen() {
 }
 
 @Composable
-fun SessionButton(
+fun SessionTypeButton(
     title: String,
     selected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-
     Button(
         onClick = onClick,
-
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(58.dp),
-
-        shape = RoundedCornerShape(16.dp),
-
+        modifier = modifier.height(44.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-
-            containerColor = if (selected)
-                DeepGreen
-            else
-                CardBackground
+            containerColor = if (selected) DeepGreen else CardBackground
         )
-
     ) {
-
         Text(
             text = title,
-            fontSize = 18.sp,
-            color = if (selected)
-                CreamBackground
-            else
-                DeepGreen
+            fontSize = 13.sp,
+            color = if (selected) CreamBackground else DeepGreen,
+            fontWeight = FontWeight.SemiBold
         )
     }
 }
 
-
 @Composable
-fun DurationButton(
-    minutes: Int,
-    selected: Boolean,
-    onClick: () -> Unit
+fun TimeInputField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier
 ) {
-
-    Button(
-        onClick = onClick,
-
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (selected)
-                BurntVienna
-            else
-                CardBackground
+    TextField(
+        value = value,
+        onValueChange = { newValue ->
+            if (newValue.isEmpty() || (newValue.toIntOrNull() != null && newValue.toInt() >= 0)) {
+                onValueChange(newValue)
+            }
+        },
+        label = { Text(label, fontSize = 12.sp) },
+        modifier = modifier
+            .height(56.dp),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = CreamBackground,
+            unfocusedContainerColor = Color.White,
+            focusedIndicatorColor = BurntVienna,
+            unfocusedIndicatorColor = MutedClay
+        ),
+        textStyle = androidx.compose.material3.LocalTextStyle.current.copy(
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
         )
-    ) {
-
-        Text(
-            text = "${minutes}m",
-            color = if (selected)
-                CreamBackground
-            else
-                DeepGreen
-        )
-    }
+    )
 }
