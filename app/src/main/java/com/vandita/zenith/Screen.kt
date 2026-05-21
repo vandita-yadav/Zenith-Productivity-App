@@ -1,10 +1,21 @@
 package com.vandita.zenith
 
-sealed class Screen(val route: String) {
+sealed class Screen {
+    abstract val route: String
 
-    object Dashboard : Screen("dashboard")
+    object Dashboard : Screen() {
+        override val route: String = "dashboard"
+    }
 
-    object ZenMode : Screen("zen_mode")
+    object ZenMode : Screen() {
+        override val route: String = "zen_mode"
+    }
 
-    object History : Screen("history")
+    object History : Screen() {
+        override val route: String = "history"
+    }
+
+    object About : Screen() {
+        override val route: String = "about"
+    }
 }

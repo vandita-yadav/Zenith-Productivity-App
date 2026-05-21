@@ -1,6 +1,5 @@
 package com.vandita.zenith
 
-import android.media.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,7 +9,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -20,9 +18,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
+import androidx.navigation.NavController
 
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(navController: NavController) {
     val context = LocalContext.current
 
     // Load real usage data from phone
@@ -41,7 +40,10 @@ fun DashboardScreen() {
 
         ZenithHeader(
             title = "Welcome",
-            iconRes = R.drawable.hello
+            iconRes = R.drawable.hello,
+            onMenuClick = {
+                navController.navigate(Screen.About.route)
+            }
         )
 
         LazyColumn(
@@ -67,28 +69,28 @@ fun DashboardScreen() {
                 ) {
                     Text(
                         text = "Today's Focus",
-                        fontSize = 13.sp,
-                        color = Color.White.copy(alpha = 0.8f)
+                        fontSize = 14.sp,
+                        color = Color.White
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = scoreLabel,
                         fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.SemiBold,
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = scoreMessage,
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.9f)
+                        color = Color.White
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = "Total screen time: ${totalMinutes / 60}h ${totalMinutes % 60}m",
-                        fontSize = 13.sp,
-                        color = Color.White.copy(alpha = 0.85f),
-                        fontWeight = FontWeight.Medium
+                        fontSize = 15.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }
@@ -153,7 +155,7 @@ fun DashboardScreen() {
                     } else 0
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().height(140.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         KPICard(

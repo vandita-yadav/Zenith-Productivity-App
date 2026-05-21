@@ -13,14 +13,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+import androidx.navigation.NavController
+
 @Composable
-fun HistoryScreen(completedSessions: List<FocusSession> = emptyList()) {
+fun HistoryScreen(completedSessions: List<FocusSession> = emptyList(), navController: NavController) {
 
     Column(modifier = Modifier.fillMaxSize())
     {
         ZenithHeader(
             title = "History",
-            iconRes = R.drawable.history
+            iconRes = R.drawable.history,  // or whatever icon you use
+            onMenuClick = {
+                navController.navigate(Screen.About.route)
+            }
         )
 
 

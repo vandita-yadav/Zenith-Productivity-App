@@ -19,13 +19,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.Image
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavController
 
 @Composable
-fun ZenModeScreen(completedSessions: List<FocusSession> = emptyList(),
-                  onSessionAdded: (FocusSession) -> Unit = {}) {
+fun ZenModeScreen(completedSessions: List<FocusSession> = emptyList(), onSessionAdded: (FocusSession) -> Unit = {}, navController: NavController)
+{
 
     var selectedSession by remember { mutableStateOf("Study") }
     var hours by remember { mutableStateOf("0") }
@@ -33,54 +31,39 @@ fun ZenModeScreen(completedSessions: List<FocusSession> = emptyList(),
     var seconds by remember { mutableStateOf("0") }
     var sessionStarted by remember { mutableStateOf(false) }
 
-
-    // Calculate total seconds
-    val totalSeconds = try {
-        (hours.toIntOrNull() ?: 0) * 3600 + (minutes.toIntOrNull()
-            ?: 0) * 60 + (seconds.toIntOrNull() ?: 0)
-    } catch (e: Exception) {
-        0
-    }
+    val totalSeconds =
+        try {
+            (hours.toIntOrNull() ?: 0) * 3600 + (minutes.toIntOrNull() ?: 0) * 60 + (seconds.toIntOrNull() ?: 0)
+        }
+        catch (e: Exception) {0}
 
     Column(modifier = Modifier.fillMaxSize())
     {
         ZenithHeader(
-            title = "Focus Session",
-            iconRes = R.drawable.tree
+            title = "Focus Mode",
+            iconRes = R.drawable.growth_icon,  // or whatever
+            onMenuClick = {
+                navController.navigate(Screen.About.route)
+            }
         )
-
 
         Spacer(modifier = Modifier.height(5.dp))
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(CreamBackground)
-                .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
+        Column(modifier = Modifier.fillMaxSize().background(CreamBackground).padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween)
+        {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            if (!sessionStarted) {
+            if (!sessionStarted)
+            {
                 // Session Type Selection
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally)
+                {
 
-                    Text(
-                        text = "Select Session Type",
-                        fontSize = 14.sp,
-                        color = MutedClay,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
+                    Text(text = "Select Session Type", fontSize = 14.sp, color = MutedClay, modifier = Modifier.padding(bottom = 12.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp))
+                    {
                         SessionTypeButton(
                             title = "Study",
                             selected = selectedSession == "Study",
@@ -104,15 +87,9 @@ fun ZenModeScreen(completedSessions: List<FocusSession> = emptyList(),
                     }
                 }
 
-                // Time Input
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(CardBackground, RoundedCornerShape(16.dp))
-                        .padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
 
+                Column(modifier = Modifier.fillMaxWidth().background(CardBackground, RoundedCornerShape(16.dp)).padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally)
+                {
                     Text(
                         text = "Set Duration (HH:MM:SS)",
                         fontSize = 14.sp,
@@ -120,11 +97,8 @@ fun ZenModeScreen(completedSessions: List<FocusSession> = emptyList(),
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically)
+                    {
 
                         // Hours
                         TimeInputField(
@@ -157,8 +131,7 @@ fun ZenModeScreen(completedSessions: List<FocusSession> = emptyList(),
                 }
 
                 // Start Button
-                Button(
-                    onClick = {
+                Button(onClick = {
                         if (totalSeconds > 0) {
                             sessionStarted = true
                         }

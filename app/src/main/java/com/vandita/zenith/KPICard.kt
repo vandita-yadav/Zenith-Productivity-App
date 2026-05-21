@@ -30,17 +30,17 @@ fun KPICard(
     ) {
         Text(
             text = title,
-            fontSize = 12.sp,
-            color = MutedClay,
-            fontWeight = FontWeight.Medium
+            fontSize = 15.sp,
+            color = Color.Black,
+            fontWeight = FontWeight.Bold
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
             text = value,
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
             color = valueColor
         )
 
@@ -49,7 +49,8 @@ fun KPICard(
             Text(
                 text = subtitle,
                 fontSize = 12.sp,
-                color = MutedClay
+                color = Color.Black,
+                fontWeight = FontWeight.Bold
             )
         }
     }

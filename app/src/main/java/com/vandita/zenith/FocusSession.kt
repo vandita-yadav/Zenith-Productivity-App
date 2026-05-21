@@ -3,6 +3,14 @@ package com.vandita.zenith
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.graphics.drawable.Drawable
+
+data class AppUsageInfo(
+    val appName: String,
+    val packageName: String,
+    val totalMinutes: Long,
+    val appIcon: Drawable? = null
+)
 
 data class FocusSession(
     val sessionType: String,      // "Study", "Work", "Gym"

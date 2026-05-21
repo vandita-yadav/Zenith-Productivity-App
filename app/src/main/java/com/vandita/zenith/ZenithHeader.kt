@@ -3,16 +3,19 @@ package com.vandita.zenith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,8 +26,10 @@ import androidx.compose.ui.res.painterResource
 @Composable
 fun ZenithHeader(
     title: String,
-    iconRes: Int
+    iconRes: Int,
+    onMenuClick: () -> Unit = {}
 ) {
+    var menuExpanded by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -43,12 +48,30 @@ fun ZenithHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = null,
-                tint = CreamBackground,
-                modifier = Modifier.size(28.dp)
-            )
+            Box {
+                IconButton(onClick = { menuExpanded = !menuExpanded }) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Menu",
+                        tint = androidx.compose.ui.graphics.Color.White,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false },
+                    modifier = Modifier.background(androidx.compose.ui.graphics.Color.Black)
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("About App") },
+                        onClick = {
+                            menuExpanded = false
+                            onMenuClick()
+                        }
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -62,7 +85,7 @@ fun ZenithHeader(
 
             Text(
                 text = title,
-                color = CreamBackground,
+                color = androidx.compose.ui.graphics.Color.White,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -76,7 +99,7 @@ fun ZenithHeader(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(CreamBackground.copy(alpha = 0.15f)),
+                    .background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f)),
 
                 contentAlignment = Alignment.Center
             ) {
@@ -84,7 +107,7 @@ fun ZenithHeader(
                 Icon(
                     imageVector = Icons.Default.Notifications,
                     contentDescription = null,
-                    tint = CreamBackground
+                    tint = androidx.compose.ui.graphics.Color.White
                 )
             }
 
@@ -94,7 +117,7 @@ fun ZenithHeader(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(CreamBackground.copy(alpha = 0.15f)),
+                    .background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f)),
 
                 contentAlignment = Alignment.Center
             ) {
@@ -102,7 +125,7 @@ fun ZenithHeader(
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = null,
-                    tint = CreamBackground
+                    tint = androidx.compose.ui.graphics.Color.White
                 )
             }
         }

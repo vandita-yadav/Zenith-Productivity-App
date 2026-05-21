@@ -23,7 +23,7 @@ fun ZenithNavigation()
 {
 
     var completedSessions by remember { mutableStateOf<List<FocusSession>>(emptyList()) }
-
+    var showAbout by remember { mutableStateOf(false) }
     val navController = rememberNavController()
 
     data class BottomNavItem(val title: String, val icon: ImageVector, val route: String)
@@ -93,9 +93,12 @@ fun ZenithNavigation()
             startDestination = `Screen`.Dashboard.route,
             modifier = Modifier.padding(paddingValues)
         ) {
-
             composable(`Screen`.Dashboard.route) {
-                DashboardScreen()
+                DashboardScreen(navController = navController)
+            }
+
+            composable(Screen.History.route) {
+                HistoryScreen(completedSessions = completedSessions, navController = navController)
             }
 
             composable(Screen.ZenMode.route) {
@@ -103,12 +106,13 @@ fun ZenithNavigation()
                     completedSessions = completedSessions,
                     onSessionAdded = { session ->
                         completedSessions = completedSessions + session
-                    }
+                    },
+                    navController = navController
                 )
             }
 
-            composable(Screen.History.route) {
-                HistoryScreen(completedSessions = completedSessions)
+            composable(Screen.About.route) {
+                AboutScreen(onBackClick = { navController.popBackStack() })
             }
         }
     }

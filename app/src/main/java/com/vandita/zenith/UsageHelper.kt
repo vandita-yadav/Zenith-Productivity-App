@@ -1,16 +1,9 @@
 package com.vandita.zenith
 
-import android.content.Context
-import android.content.pm.PackageManager
 import android.app.usage.UsageStatsManager
-import java.util.Calendar
+import android.content.Context
 import androidx.compose.ui.graphics.Color
-
-data class AppUsageInfo(
-    val appName: String,
-    val packageName: String,
-    val totalMinutes: Long
-)
+import java.util.Calendar
 
 // System apps to hide — they're not useful to the user
 private val hiddenPackages = setOf(
@@ -30,12 +23,14 @@ private val hiddenPackages = setOf(
 )
 
 fun getTopApps(context: Context): List<AppUsageInfo> {
+
     val usageStatsManager = context.getSystemService(
         Context.USAGE_STATS_SERVICE
     ) as UsageStatsManager
 
     val calendar = Calendar.getInstance()
     val endTime = calendar.timeInMillis
+
     calendar.add(Calendar.DAY_OF_YEAR, -1)
     val startTime = calendar.timeInMillis
 
@@ -49,56 +44,72 @@ fun getTopApps(context: Context): List<AppUsageInfo> {
 
     return stats
         .filter { stat ->
-            stat.totalTimeInForeground > 60000  // minimum 1 minute — removes 0m apps
-                    && stat.packageName !in hiddenPackages  // removes system/launcher apps
-                    && stat.packageName != context.packageName  // removes Zenith itself
-                    && !stat.packageName.startsWith("com.example")
+            stat.totalTimeInForeground > 60000 &&
+                    stat.packageName !in hiddenPackages &&
+                    stat.packageName != context.packageName &&
+                    !stat.packageName.startsWith("com.example")
         }
-        .sortedByDescending { it.totalTimeInForeground }
-        .take(7)
-        .map { stat ->
+
+        // Group same apps together
+        .groupBy { it.packageName }
+
+        // Sum their times
+        .mapValues { (_, group) ->
+            group.sumOf { it.totalTimeInForeground }
+        }
+
+        .map { (packageName, totalTime) ->
+
             val appName = try {
+
                 pm.getApplicationLabel(
-                    pm.getApplicationInfo(stat.packageName, 0)
+                    pm.getApplicationInfo(packageName, 0)
                 ).toString()
-            } catch (e: PackageManager.NameNotFoundException) {
-                // If name not found, skip it by using package name
-                // We'll filter these out below
-                stat.packageName
+
+            } catch (e: Exception) {
+
+                packageName
+                    .split(".")
+                    .last()
+                    .replaceFirstChar { it.uppercase() }
             }
+
             AppUsageInfo(
                 appName = appName,
-                packageName = stat.packageName,
-                totalMinutes = stat.totalTimeInForeground / 60000
+                packageName = packageName,
+                totalMinutes = totalTime / 60000
             )
         }
-        .filter { app ->
-            // Remove anything that still shows raw package name format
-            !app.appName.contains(".")
-                    || app.appName.length < 30
-        }
+
+        .sortedByDescending { it.totalMinutes }
+        .take(7)
 }
 
 fun getTotalScreenMinutes(apps: List<AppUsageInfo>): Long {
+
     return apps.sumOf { it.totalMinutes }
 }
 
 fun getHealthScore(totalMinutes: Long): Triple<String, String, Color> {
+
     return when {
+
         totalMinutes < 120 -> Triple(
             "Focused",
             "Great job! You're having a productive day.",
-            Color(0xFF6A7E3F)  // olive green
+            Color(0xFF6A7E3F) // olive green
         )
+
         totalMinutes < 240 -> Triple(
             "Moderate",
             "You're doing okay. Try to take a few breaks.",
-            Color(0xFFB76240)  // burnt vienna
+            Color(0xFFB76240) // burnt vienna
         )
+
         else -> Triple(
             "Distracted",
             "Heavy screen day. Maybe time for a break?",
-            Color(0xFFD96868)  // alert red
+            Color(0xFFD96868) // alert red
         )
     }
 }
