@@ -41,7 +41,7 @@ fun ZenModeScreen(completedSessions: List<FocusSession> = emptyList(), onSession
     {
         ZenithHeader(
             title = "Focus Mode",
-            iconRes = R.drawable.growth_icon,  // or whatever
+            iconRes = R.drawable.tree,  // or whatever
             onMenuClick = {
                 navController.navigate(Screen.About.route)
             }
